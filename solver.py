@@ -242,4 +242,4 @@ def process_data(kind, data, methods, x_star, gui):
     except AttributeError:
         pass
 
-    gui.ok("Готово")
+    gui.show_ok("Готово")
