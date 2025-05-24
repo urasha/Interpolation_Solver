@@ -1,7 +1,7 @@
 import sys
 
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QDoubleValidator
+from PyQt6.QtGui import QDoubleValidator, QPalette, QColor
 from PyQt6.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QHBoxLayout, QGroupBox, QRadioButton,
     QCheckBox, QLabel, QPushButton, QTableWidget, QTableWidgetItem,
@@ -15,6 +15,59 @@ import solver
 
 MAX_POINTS = 20
 FUNCTIONS = ["sin(x)", "cos(x)", "exp(x)"]
+
+
+def set_modern_light_theme(app):
+    palette = QPalette()
+    palette.setColor(QPalette.ColorRole.Window, QColor("#f0f2f5"))
+    palette.setColor(QPalette.ColorRole.WindowText, Qt.GlobalColor.black)
+    palette.setColor(QPalette.ColorRole.Base, QColor("#ffffff"))
+    palette.setColor(QPalette.ColorRole.AlternateBase, QColor("#f7f9fc"))
+    palette.setColor(QPalette.ColorRole.ToolTipBase, QColor("#ffffff"))
+    palette.setColor(QPalette.ColorRole.ToolTipText, Qt.GlobalColor.black)
+    palette.setColor(QPalette.ColorRole.Text, Qt.GlobalColor.black)
+    palette.setColor(QPalette.ColorRole.Button, QColor("#e1e5eb"))
+    palette.setColor(QPalette.ColorRole.ButtonText, Qt.GlobalColor.black)
+    palette.setColor(QPalette.ColorRole.BrightText, Qt.GlobalColor.red)
+    palette.setColor(QPalette.ColorRole.Highlight, QColor("#0078d7"))
+    palette.setColor(QPalette.ColorRole.HighlightedText, Qt.GlobalColor.white)
+    app.setPalette(palette)
+
+    app.setStyleSheet("""
+        QWidget {
+            font-family: Segoe UI, sans-serif;
+            font-size: 13px;
+            color: #000000;
+        }
+        QMainWindow {
+            background-color: #f0f2f5;
+        }
+        QPushButton {
+            background-color: #0078d7;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+        }
+        QPushButton:hover {
+            background-color: #005fa1;
+        }
+        QLineEdit, QComboBox {
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 4px;
+        }
+        QTableWidget {
+            background-color: white;
+            border: 1px solid #ccc;
+        }
+        QHeaderView::section {
+            background-color: #e1e5eb;
+            padding: 4px;
+            border: 1px solid #d0d0d0;
+        }
+    """)
 
 
 class InterpolatorGUI(QWidget):
@@ -36,8 +89,8 @@ class InterpolatorGUI(QWidget):
         src_box = QGroupBox("Ввод данных")
         sl = QVBoxLayout(src_box)
         self.rb_table = QRadioButton("Таблица")
-        self.rb_file  = QRadioButton("Файл")
-        self.rb_func  = QRadioButton("Функция")
+        self.rb_file = QRadioButton("Файл")
+        self.rb_func = QRadioButton("Функция")
         self.rb_table.setChecked(True)
         for rb in (self.rb_table, self.rb_file, self.rb_func):
             sl.addWidget(rb)
@@ -46,15 +99,16 @@ class InterpolatorGUI(QWidget):
 
         meth_box = QGroupBox("Методы интерполяции")
         ml = QVBoxLayout(meth_box)
-        self.cb_lagr     = QCheckBox("Лагранж")
-        self.cb_newton   = QCheckBox("Ньютон")
-        self.cb_gauss    = QCheckBox("Гаусс")
+        self.cb_lagr = QCheckBox("Лагранж")
+        self.cb_newton = QCheckBox("Ньютон")
+        self.cb_gauss = QCheckBox("Гаусс")
         self.cb_stirling = QCheckBox("Стирлинг")
-        self.cb_bessel   = QCheckBox("Бессель")
+        self.cb_bessel = QCheckBox("Бессель")
         for cb in (self.cb_lagr, self.cb_newton, self.cb_gauss,
                    self.cb_stirling, self.cb_bessel):
             ml.addWidget(cb)
-        btn_all = QPushButton("Выбрать всё"); btn_all.clicked.connect(self._select_all)
+        btn_all = QPushButton("Выбрать всё");
+        btn_all.clicked.connect(self._select_all)
         ml.addWidget(btn_all)
         left_panel.addWidget(meth_box)
 
@@ -63,7 +117,8 @@ class InterpolatorGUI(QWidget):
         self.canvas = FigureCanvas(self.figure)
         top.addWidget(self.canvas, stretch=5)
 
-        mid = QHBoxLayout(); root.addLayout(mid, stretch=5)
+        mid = QHBoxLayout();
+        root.addLayout(mid, stretch=5)
 
         inp_layout = QVBoxLayout()
         mid.addLayout(inp_layout, stretch=3)
@@ -102,47 +157,71 @@ class InterpolatorGUI(QWidget):
         rl.addWidget(self.tbl_results)
         tbl_layout.addWidget(res_box)
 
-        bottom = QHBoxLayout(); root.addLayout(bottom, stretch=1)
-        self.status = QStatusBar(); bottom.addWidget(self.status, stretch=5)
-        btn_solve = QPushButton("Решить"); btn_solve.clicked.connect(self._solve)
+        bottom = QHBoxLayout();
+        root.addLayout(bottom, stretch=1)
+        self.status = QStatusBar();
+        bottom.addWidget(self.status, stretch=5)
+        btn_solve = QPushButton("Решить");
+        btn_solve.clicked.connect(self._solve)
         bottom.addWidget(btn_solve, stretch=1)
 
     def _page_table(self):
-        w = QWidget(); l = QVBoxLayout(w)
+        w = QWidget();
+        l = QVBoxLayout(w)
         self.tbl_input = QTableWidget(3, 2)
         self.tbl_input.setHorizontalHeaderLabels(["x", "y"])
         l.addWidget(self.tbl_input)
-        btns = QHBoxLayout(); btns.addStretch()
-        plus = QPushButton("+ строка"); plus.clicked.connect(self._add_row)
-        minus = QPushButton("– строка"); minus.clicked.connect(self._del_row)
-        btns.addWidget(plus); btns.addWidget(minus); btns.addStretch()
+        btns = QHBoxLayout();
+        btns.addStretch()
+        plus = QPushButton("+ строка");
+        plus.clicked.connect(self._add_row)
+        minus = QPushButton("– строка");
+        minus.clicked.connect(self._del_row)
+        btns.addWidget(plus);
+        btns.addWidget(minus);
+        btns.addStretch()
         l.addLayout(btns)
         self.pages.addWidget(w)
 
     def _page_file(self):
-        w = QWidget(); l = QVBoxLayout(w)
-        self.le_path = QLineEdit(); self.le_path.setReadOnly(True)
-        btn = QPushButton("Обзор…"); btn.clicked.connect(self._browse)
-        row = QHBoxLayout(); row.addWidget(self.le_path); row.addWidget(btn)
+        w = QWidget();
+        l = QVBoxLayout(w)
+        self.le_path = QLineEdit();
+        self.le_path.setReadOnly(True)
+        btn = QPushButton("Обзор…");
+        btn.clicked.connect(self._browse)
+        row = QHBoxLayout();
+        row.addWidget(self.le_path);
+        row.addWidget(btn)
         l.addLayout(row)
         self.pages.addWidget(w)
 
     def _page_func(self):
-        w = QWidget(); l = QVBoxLayout(w)
+        w = QWidget();
+        l = QVBoxLayout(w)
         row1 = QHBoxLayout()
-        self.cmb_func = QComboBox(); self.cmb_func.addItems(FUNCTIONS)
-        row1.addWidget(QLabel("f(x) =")); row1.addWidget(self.cmb_func)
+        self.cmb_func = QComboBox();
+        self.cmb_func.addItems(FUNCTIONS)
+        row1.addWidget(QLabel("f(x) ="));
+        row1.addWidget(self.cmb_func)
         l.addLayout(row1)
         row2 = QHBoxLayout()
         val = QDoubleValidator()
-        self.le_left  = QLineEdit("-3.14"); self.le_left.setValidator(val)
-        self.le_right = QLineEdit(" 3.14");  self.le_right.setValidator(val)
-        row2.addWidget(QLabel("От")); row2.addWidget(self.le_left)
-        row2.addWidget(QLabel("До")); row2.addWidget(self.le_right)
+        self.le_left = QLineEdit("-3.14");
+        self.le_left.setValidator(val)
+        self.le_right = QLineEdit(" 3.14");
+        self.le_right.setValidator(val)
+        row2.addWidget(QLabel("От"));
+        row2.addWidget(self.le_left)
+        row2.addWidget(QLabel("До"));
+        row2.addWidget(self.le_right)
         l.addLayout(row2)
         row3 = QHBoxLayout()
-        self.sb_n = QSpinBox(); self.sb_n.setRange(2, MAX_POINTS); self.sb_n.setValue(5)
-        row3.addWidget(QLabel("N точек")); row3.addWidget(self.sb_n)
+        self.sb_n = QSpinBox();
+        self.sb_n.setRange(2, MAX_POINTS);
+        self.sb_n.setValue(5)
+        row3.addWidget(QLabel("N точек"));
+        row3.addWidget(self.sb_n)
         l.addLayout(row3)
         self.pages.addWidget(w)
 
@@ -152,9 +231,12 @@ class InterpolatorGUI(QWidget):
             cb.setChecked(True)
 
     def _switch_page(self):
-        if   self.rb_table.isChecked(): self.pages.setCurrentIndex(0)
-        elif self.rb_file.isChecked():  self.pages.setCurrentIndex(1)
-        else:                            self.pages.setCurrentIndex(2)
+        if self.rb_table.isChecked():
+            self.pages.setCurrentIndex(0)
+        elif self.rb_file.isChecked():
+            self.pages.setCurrentIndex(1)
+        else:
+            self.pages.setCurrentIndex(2)
 
     def _add_row(self):
         if self.tbl_input.rowCount() < MAX_POINTS:
@@ -209,11 +291,11 @@ class InterpolatorGUI(QWidget):
             return
 
         methods = {
-            'lagrange':   self.cb_lagr.isChecked(),
-            'newton':     self.cb_newton.isChecked(),
-            'gauss':      self.cb_gauss.isChecked(),
-            'stirling':   self.cb_stirling.isChecked(),
-            'bessel':     self.cb_bessel.isChecked()
+            'lagrange': self.cb_lagr.isChecked(),
+            'newton': self.cb_newton.isChecked(),
+            'gauss': self.cb_gauss.isChecked(),
+            'stirling': self.cb_stirling.isChecked(),
+            'bessel': self.cb_bessel.isChecked()
         }
 
         solver.process_data(data_kind, data, methods, self.sb_xstar.value(), self)
@@ -258,7 +340,7 @@ class InterpolatorGUI(QWidget):
         self.ax.clear()
         self.ax.scatter(xs, ys, label="Узлы")
 
-        xx = [xs[0] + i*(xs[-1]-xs[0])/300 for i in range(301)]
+        xx = [xs[0] + i * (xs[-1] - xs[0]) / 300 for i in range(301)]
         yy_n = [solver.interp_newton(points, x) for x in xx]
         self.ax.plot(xx, yy_n, linestyle="--", label="Ньютон")
 
@@ -277,6 +359,7 @@ class InterpolatorGUI(QWidget):
 
 def main():
     app = QApplication(sys.argv)
+    set_modern_light_theme(app)
     gui = InterpolatorGUI()
     gui.show()
     sys.exit(app.exec())
