@@ -227,11 +227,17 @@ def process_data(kind, data, methods, x_star, gui):
             y = interp_gauss(points, x_star)
             gui.add_result('Гаусс', f"{y:.6f}")
         if methods.get('stirling'):
-            y = interp_stirling(points, x_star)
-            gui.add_result('Стирлинг', f"{y:.6f}")
+            if len(points) % 2 == 0:
+                gui.show_error("Для метода Стирлинга нужно нечётное число узлов")
+            else:
+                y = interp_stirling(points, x_star)
+                gui.add_result('Стирлинг', f"{y:.6f}")
         if methods.get('bessel'):
-            y = interp_bessel(points, x_star)
-            gui.add_result('Бессель', f"{y:.6f}")
+            if len(points) % 2 == 1:
+                gui.show_error("Для метода Бесселя нужно чётное число узлов")
+            else:
+                y = interp_bessel(points, x_star)
+                gui.add_result('Бессель', f"{y:.6f}")
     except Exception as e:
         gui.show_error(f"Ошибка вычислений: {e}")
         return
