@@ -146,7 +146,6 @@ def interp_bessel(points, x0):
     result = 0.5 * (ys[m] + ys[m + 1])
     result += (t - 0.5) * diff[1][m]
 
-    # коэффициенты для even/odd
     even_coeff = t * (t - 1) / 2
     odd_coeff = (t - 0.5) * t * (t - 1) / 6
 

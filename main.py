@@ -347,7 +347,16 @@ class InterpolatorGUI(QWidget):
         yy_g = [solver.interp_gauss(points, x) for x in xx]
         self.ax.plot(xx, yy_g, linestyle="-.", label="Гаусс")
 
-        y0 = solver.interp_gauss(points, x0) if self.cb_gauss.isChecked() else solver.interp_newton(points, x0)
+        yy_s = [solver.interp_stirling(points, x) for x in xx]
+        self.ax.plot(xx, yy_s, linestyle=":", label="Стирлинг")
+
+        yy_b = [solver.interp_bessel(points, x) for x in xx]
+        self.ax.plot(xx, yy_b, linestyle="--", label="Бессель")
+
+        yy_l = [solver.interp_lagrange(points, x) for x in xx]
+        self.ax.plot(xx, yy_l, linestyle="--", label="Лагранж")
+
+        y0 = solver.interp_newton(points, x0)
         self.ax.scatter([x0], [y0], marker="x", s=100, label=f"x*={x0:.4g}")
         self.ax.set_xlabel("x")
         self.ax.set_ylabel("y")
